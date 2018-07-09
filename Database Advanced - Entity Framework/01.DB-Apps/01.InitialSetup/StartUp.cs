@@ -11,8 +11,8 @@
                 connection.Open();
 
                 // Creating Database
-                ExecNonQuerry("CREATE DATABASE " + Configuration.databaseName, connection);
-                connection.ChangeDatabase(Configuration.databaseName);
+                ExecNonQuerry("CREATE DATABASE " + Configuration.DatabaseName, connection);
+                connection.ChangeDatabase(Configuration.DatabaseName);
 
                 // Creating Tables
                 ExecNonQuerry("CREATE TABLE Countries (Id INT PRIMARY KEY IDENTITY,Name VARCHAR(50))", connection);

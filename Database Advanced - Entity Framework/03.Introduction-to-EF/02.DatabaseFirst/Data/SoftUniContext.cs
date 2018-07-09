@@ -27,7 +27,7 @@ namespace P02_DatabaseFirst.Data.Models
         {
             if (!optionsBuilder.IsConfigured)
             {
-                var connectionString = String.Format(File.ReadAllText(@"F:\base\MSSQL_connectionString.txt"), "SoftUni");
+                var connectionString = String.Format(File.ReadAllText(@"C:\Program Files\Microsoft SQL Server\MSSQL_connectionString.txt"), "SoftUni");
                 optionsBuilder.UseSqlServer(connectionString);
             }
         }

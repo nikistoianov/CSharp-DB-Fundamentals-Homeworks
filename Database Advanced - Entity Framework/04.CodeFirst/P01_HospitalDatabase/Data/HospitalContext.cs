@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using P01_HospitalDatabase.Data.EntityConfiguration;
 using P01_HospitalDatabase.Data.Models;
 
 namespace P01_HospitalDatabase.Data
@@ -21,7 +22,10 @@ namespace P01_HospitalDatabase.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<PatientMedicament>().HasKey(x => new { x.MedicamentId, x.PatientId});
+            modelBuilder.Entity<PatientMedicament>()
+                .HasKey(x => new { x.MedicamentId, x.PatientId});
+
+            modelBuilder.ApplyConfiguration(new PatientConfig());
         }
     }
 }

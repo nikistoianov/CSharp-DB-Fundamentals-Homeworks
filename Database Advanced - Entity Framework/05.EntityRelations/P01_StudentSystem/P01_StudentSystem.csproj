@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Common\Common.csproj" />
     <ProjectReference Include="..\P01_StudentSystem.Data.Models\P01_StudentSystem.Data.Models.csproj" />
     <ProjectReference Include="..\P01_StudentSystem.Data\P01_StudentSystem.Data.csproj" />
   </ItemGroup>

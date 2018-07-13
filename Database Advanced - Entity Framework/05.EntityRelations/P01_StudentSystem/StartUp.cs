@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Common.Generators;
+using Microsoft.EntityFrameworkCore;
 using P01_StudentSystem.Data;
 using P01_StudentSystem.Data.Models;
 using P01_StudentSystem.Data.Models.Enums;
@@ -11,29 +12,59 @@ namespace P01_StudentSystem
     {
         static void Main()
         {
+            //DatabaseInitializer.ResetDatabase();
+
             using (var db = new StudentSystemContext())
             {
-                db.Database.EnsureCreated();
+                //DatabaseInitializer.InitialSeed(db);
 
-                AddResource(db);
+                //AddResource(db);
 
-                AddHomework(db);
+                //AddHomework(db);
 
-                var resourses = db.Resources.Include(x => x.Course).ToArray();
-                Console.WriteLine("Resources:");
-                foreach (var res in resourses)
+                Output(db);
+            }
+        }
+
+        private static void Output(StudentSystemContext db)
+        {
+            var resourses = db.Resources.Include(x => x.Course).ToArray();
+            Console.WriteLine("Resources:");
+            foreach (var res in resourses)
+            {
+                var line = $"  --> Name: {res.Name}, Type: {res.ResourceType}, Course Name: {res.Course.Name}";
+                Console.WriteLine(line);
+            }
+
+            //var homeworks = db.HomeworkSubmissions.ToArray();
+            //Console.WriteLine("Homeworks:");
+            //foreach (var h in homeworks)
+            //{
+            //    var line = $"  --> Content: {h.Content}, Type: {h.ContentType}";
+            //    Console.WriteLine(line);
+            //}
+
+            var students = db.Students
+                .Include(x => x.HomeworkSubmissions)
+                .ToArray();
+            Console.WriteLine("Students:");
+            foreach (var s in students)
+            {
+                var line = $"  --> Name: {s.Name}, RegisteredOn: {s.RegisteredOn.ToString()}";
+                Console.WriteLine(line);
+                foreach (var homework in s.HomeworkSubmissions)
                 {
-                    var line = $"  --> Name: {res.Name}, Type: {res.ResourceType}, Course Name: {res.Course.Name}";
-                    Console.WriteLine(line);
+                    Console.WriteLine($"     --> Homework: {homework.Content}, {homework.ContentType}");
                 }
+            }
 
-                var homeworks = db.HomeworkSubmissions.ToArray();
-                Console.WriteLine("Homeworks:");
-                foreach (var h in homeworks)
-                {
-                    var line = $"  --> Content: {h.Content}, Type: {h.ContentType}";
-                    Console.WriteLine(line);
-                }
+            var courses = db.Courses
+                .ToArray();
+            Console.WriteLine();
+            Console.WriteLine("Courses:");
+            foreach (var c in courses)
+            {
+                Console.WriteLine($"  --> StartDate: {c.StartDate}, EndDate: {c.EndDate}");
             }
         }
 

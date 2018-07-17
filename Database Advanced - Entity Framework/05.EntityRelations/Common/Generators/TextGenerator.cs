@@ -25,5 +25,17 @@
 
             return name;
         }
+
+        public static string Password(int passwordLength)
+        {
+            Random rnd = new Random();
+            var result = "";
+            for (int i = 0; i < passwordLength; i++)
+            {
+                var ch = (char)rnd.Next(48, 125);
+                result += ch;
+            }
+            return result;
+        }
     }
 }

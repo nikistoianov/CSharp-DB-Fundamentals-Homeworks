@@ -1,6 +1,4 @@
-﻿using System;
-using System.Linq;
-using Microsoft.EntityFrameworkCore;
+﻿using System.Linq;
 using P01_StudentSystem.Data;
 using P01_StudentSystem.Generators;
 
@@ -29,10 +27,7 @@ namespace P01_StudentSystem
             var students = context.Students.ToList();
             var courses = context.Courses.ToList();
             HomeworkGenerator.InitialHomeworkSeed(context, 30, courses, students);
-
-            //SeedPatients(context, 200);
-
-            //SeedPrescriptions(context);
+            
         }
 
     }

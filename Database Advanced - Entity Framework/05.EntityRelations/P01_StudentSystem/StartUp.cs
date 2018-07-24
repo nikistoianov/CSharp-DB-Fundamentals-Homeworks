@@ -26,9 +26,7 @@ namespace P01_StudentSystem
                 //DatabaseInitializer.InitialSeed(db);
 
                 //AddResource(db);
-
-                //AddHomework(db);
-
+                
                 //Output(db);
             }
         }
@@ -51,15 +49,7 @@ namespace P01_StudentSystem
                 var line = $"  --> Name: {res.Name}, Type: {res.ResourceType}, Course Name: {res.Course.Name}";
                 Console.WriteLine(line);
             }
-
-            //var homeworks = db.HomeworkSubmissions.ToArray();
-            //Console.WriteLine("Homeworks:");
-            //foreach (var h in homeworks)
-            //{
-            //    var line = $"  --> Content: {h.Content}, Type: {h.ContentType}";
-            //    Console.WriteLine(line);
-            //}
-
+            
             var students = db.Students
                 .Include(x => x.HomeworkSubmissions)
                 .ToArray();
@@ -83,32 +73,7 @@ namespace P01_StudentSystem
                 Console.WriteLine($"  --> StartDate: {c.StartDate}, EndDate: {c.EndDate}");
             }
         }
-
-        private static void AddHomework(StudentSystemContext db)
-        {
-            var homework = new Homework()
-            {
-                Content = "My first homework",
-                ContentType = ContentType.Pdf,
-                SubmissionTime = DateTime.Now,
-                Student = new Student()
-                {
-                    Name = "Pesho",
-                    RegisteredOn = new DateTime(2015, 5, 30)
-                },
-                Course = new Course()
-                {
-                    Name = "Java",
-                    StartDate = DateTime.Now,
-                    EndDate = new DateTime(2020, 1, 2),
-                    Price = 9.99m
-                }
-            };
-
-            db.HomeworkSubmissions.Add(homework);
-            db.SaveChanges();
-        }
-
+        
         private static void AddResource(StudentSystemContext db)
         {
             var res = new Resource()

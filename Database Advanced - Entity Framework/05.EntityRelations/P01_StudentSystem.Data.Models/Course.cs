@@ -20,6 +20,7 @@ namespace P01_StudentSystem.Data.Models
         [MaxLength(80)]
         public string Name { get; set; }
 
+        [StringLength(250, MinimumLength = 5)]
         public string Description { get; set; }
 
         [Required]
@@ -29,6 +30,7 @@ namespace P01_StudentSystem.Data.Models
         public DateTime EndDate { get; set; }
 
         [Required]
+        [Range(0, 200)]
         public decimal Price { get; set; }
 
         public ICollection<Resource> Resources { get; set; }

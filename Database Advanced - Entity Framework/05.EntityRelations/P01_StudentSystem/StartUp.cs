@@ -4,6 +4,8 @@ using P01_StudentSystem.Data;
 using P01_StudentSystem.Data.Models;
 using P01_StudentSystem.Data.Models.Enums;
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
 namespace P01_StudentSystem
@@ -12,9 +14,14 @@ namespace P01_StudentSystem
     {
         static void Main()
         {
+            var homework = new Homework()
+            {
+                Content = "Stuff"
+            };
+            Console.WriteLine(IsValid(homework));
             //DatabaseInitializer.ResetDatabase();
 
-            using (var db = new StudentSystemContext())
+            //using (var db = new StudentSystemContext())
             {
                 //DatabaseInitializer.InitialSeed(db);
 
@@ -22,8 +29,17 @@ namespace P01_StudentSystem
 
                 //AddHomework(db);
 
-                Output(db);
+                //Output(db);
             }
+        }
+
+        public static bool IsValid(object obj)
+        {
+            var validationContext = new ValidationContext(obj);
+            var result = new List<ValidationResult>();
+
+            var isValid = Validator.TryValidateObject(obj, validationContext, result, true);
+            return isValid;
         }
 
         private static void Output(StudentSystemContext db)

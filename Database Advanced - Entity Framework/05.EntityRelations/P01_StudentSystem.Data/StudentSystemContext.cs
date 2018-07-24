@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using Microsoft.EntityFrameworkCore;
 using P01_StudentSystem.Data.Models;
+using P01_StudentSystem.Data.Models.Enums;
 
 namespace P01_StudentSystem.Data
 {
@@ -29,6 +31,12 @@ namespace P01_StudentSystem.Data
         {
             modelBuilder.Entity<StudentCourse>()
                 .HasKey(x => new { x.StudentId, x.CourseId});
+
+            modelBuilder.Entity<Homework>()
+                .Property(x => x.ContentType)
+                .HasConversion(
+                    v => v.ToString(),
+                    v => (ContentType)Enum.Parse(typeof(ContentType), v));
         }
     }
 }

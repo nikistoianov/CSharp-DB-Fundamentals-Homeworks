@@ -1,0 +1,7 @@
+// for Project.App to configure services
+install-package microsoft.extensions.dependencyinjection
+
+install-package automapper
+// to configure mapper in ServiceProvider
+serviceCollection.AddAutoMapper(conf => conf.AddProfile<CustomProfile>());
+install-package automapper.extensions.microsoft.dependencyinjection

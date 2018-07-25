@@ -14,12 +14,12 @@ namespace Office.Data
         public OfficeContext()
         {}
 
-        //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        //{
-        //    if (!optionsBuilder.IsConfigured)
-        //    {
-        //        optionsBuilder.UseSqlServer(DbContextConfiguration.ConnectionString);
-        //    }
-        //}
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            if (!optionsBuilder.IsConfigured)
+            {
+                optionsBuilder.UseSqlServer(DbContextConfiguration.ConnectionString);
+            }
+        }
     }
 }

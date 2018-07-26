@@ -28,14 +28,14 @@
         {
             var serviceCollection = new ServiceCollection();
 
-            //serviceCollection.AddDbContext<OfficeContext>(opts => opts.UseSqlServer(DbContextConfiguration.ConnectionString));
-            serviceCollection.AddDbContext<OfficeContext>();
+            serviceCollection.AddDbContext<OfficeContext>(opts => opts.UseSqlServer(DbContextConfiguration.ConnectionString));
 
             serviceCollection.AddTransient<IDbInitializerService, DbInitializerService>();
             serviceCollection.AddTransient<ICommandInterpreter, CommandInterpreter>();
             serviceCollection.AddTransient<IEmployeeController, EmployeeController>();
             serviceCollection.AddTransient<IReader, ConsoleReader>();
             serviceCollection.AddTransient<IWriter, ConsoleWriter>();
+            serviceCollection.AddTransient<IManagerController, ManagerController>();
 
             serviceCollection.AddAutoMapper(conf => conf.AddProfile<OfficeProfile>());
 

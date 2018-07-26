@@ -1,7 +1,7 @@
 ﻿namespace Office.App.Core.Writers
 {
     using System;
-    using Office.App.Core.Contracts;
+    using Contracts;
 
     public class ConsoleWriter : IWriter
     {

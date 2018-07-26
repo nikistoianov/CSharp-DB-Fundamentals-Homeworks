@@ -1,6 +1,7 @@
 ﻿namespace Office.App.Core.Contracts
 {
     using System;
+    using System.Collections.Generic;
     using DTOs;
 
     public interface IEmployeeController
@@ -14,5 +15,7 @@
         EmployeeDto GetEmployeeInfo(int employeeId);
 
         EmployeeFullInfoDto GetEmployeePersonalInfo(int employeeId);
+
+        List<EmployeeInfoDto> ListEmployeesOlderThan(int age);
     }
 }

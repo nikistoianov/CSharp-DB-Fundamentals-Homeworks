@@ -1,14 +1,15 @@
-﻿using AutoMapper;
-using Office.App.Core.Contracts;
-using Office.App.Core.DTOs;
-using Office.Data;
-using Office.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace Office.App.Core.Controllers
+﻿namespace Office.App.Core.Controllers
 {
+    using System;
+    using AutoMapper;
+    using Contracts;
+    using DTOs;
+    using Data;
+    using Models;
+    using System.Collections.Generic;
+    using System.Linq;
+    using AutoMapper.QueryableExtensions;
+
     public class EmployeeController : IEmployeeController
     {
         private readonly OfficeContext db;
@@ -27,18 +28,6 @@ namespace Office.App.Core.Controllers
             this.db.SaveChanges();
         }
 
-        public EmployeeDto GetEmployeeInfo(int employeeId)
-        {
-            Employee employee = GetEmployee(employeeId);
-            return this.mapper.Map<EmployeeDto>(employee);
-        }
-
-        public EmployeeFullInfoDto GetEmployeePersonalInfo(int employeeId)
-        {
-            Employee employee = GetEmployee(employeeId);
-            return this.mapper.Map<EmployeeFullInfoDto>(employee);
-        }
-
         public void SetAddress(int employeeId, string address)
         {
             Employee employee = GetEmployee(employeeId);
@@ -53,6 +42,29 @@ namespace Office.App.Core.Controllers
             this.db.SaveChanges();
         }
 
+        public EmployeeDto GetEmployeeInfo(int employeeId)
+        {
+            Employee employee = GetEmployee(employeeId);
+            return this.mapper.Map<EmployeeDto>(employee);
+        }
+
+        public EmployeeFullInfoDto GetEmployeePersonalInfo(int employeeId)
+        {
+            Employee employee = GetEmployee(employeeId);
+            return this.mapper.Map<EmployeeFullInfoDto>(employee);
+        }
+
+        public List<EmployeeInfoDto> ListEmployeesOlderThan(int age)
+        {
+            var employees = this.db.Employees
+                .Where(x => (DateTime.Today.Year - x.Birthday.Value.Year) > age)
+                .OrderByDescending(x => x.Salary)
+                .ProjectTo<EmployeeInfoDto>()
+                .ToList();
+
+            return employees;
+        }
+
         private Employee GetEmployee(int employeeId)
         {
             var employee = this.db.Employees.Find(employeeId);
@@ -63,6 +75,5 @@ namespace Office.App.Core.Controllers
 
             return employee;
         }
-
     }
 }

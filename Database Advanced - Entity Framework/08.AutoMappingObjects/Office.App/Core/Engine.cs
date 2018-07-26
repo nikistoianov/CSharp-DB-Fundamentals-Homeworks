@@ -2,8 +2,11 @@
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;
-    using Core.Contracts;
-    using Office.Services.Contracts;
+    using Contracts;
+    using Services.Contracts;
+    using AutoMapper;
+    using Models;
+    using DTOs;
 
     public class Engine : IEngine
     {
@@ -22,6 +25,13 @@
             var commandInterpreter = this.serviceProvider.GetService<ICommandInterpreter>();
             var reader = this.serviceProvider.GetService<IReader>();
             var writer = this.serviceProvider.GetService<IWriter>();
+
+            Mapper.Initialize(cfg =>
+            {
+                cfg.CreateMap<Employee, EmployeeInfoDto>()
+                   .ForMember(dest => dest.ManagerLastName, opt => opt.MapFrom(e => e.Manager.LastName))
+                   .ReverseMap();
+            });
 
             string input = "";
             while ((input = reader.ReadLine()).ToLower() != "exit")

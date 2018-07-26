@@ -1,7 +1,7 @@
 ﻿namespace Office.App.Core.Readers
 {
     using System;
-    using Office.App.Core.Contracts;
+    using Contracts;
 
     public class ConsoleReader : IReader
     {

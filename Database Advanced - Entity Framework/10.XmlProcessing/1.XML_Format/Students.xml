@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<students>
+  <student>
+    <name>Alexander</name>
+    <gender>Male</gender>
+    <birthDate>2016/10/25</birthDate>
+    <phoneNumber>5391045</phoneNumber>
+    <email>alexander1101@abv.bg</email>
+    <university>SoftUni</university>
+    <specialty>JavaScript FrontEnd Developer</specialty>
+    <facultyNumber>2611737</facultyNumber>
+    <exams>
+      <exam>
+        <name>JS Core</name>
+        <dateTaken>2014/12/18</dateTaken>
+        <grade>6.1</grade>
+      </exam>
+    </exams>
+  </student>
+  <student>
+    <name>Georgi</name>
+    <gender>Male</gender>
+    <birthDate>2016/10/21</birthDate>
+    <phoneNumber>2992420</phoneNumber>
+    <email>georgi81@students.softuni.bg</email>
+    <university>SoftUni</university>
+    <specialty>C# Web Developer</specialty>
+    <facultyNumber>8823563</facultyNumber>
+    <exams>
+      <exam>
+        <name>C# Web</name>
+        <dateTaken>2021/12/22</dateTaken>
+        <grade>6.1</grade>
+      </exam>
+    </exams>
+  </student>
+  <student>
+    <name>Mihail</name>
+    <gender>Male</gender>
+    <birthDate>2013/08/02</birthDate>
+    <phoneNumber>5804580</phoneNumber>
+    <email>mihail441@abv.bg</email>
+    <university>SoftUni</university>
+    <specialty>Java Web Developer</specialty>
+    <facultyNumber>7662931</facultyNumber>
+    <exams>
+      <exam>
+        <name>C# Web</name>
+        <dateTaken>2018/09/28</dateTaken>
+        <grade>6.1</grade>
+      </exam>
+    </exams>
+  </student>
+</students>

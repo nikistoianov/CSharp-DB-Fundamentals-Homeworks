@@ -23,9 +23,9 @@
         {
             ImportData();
             ProductsInRange();
-            SoldProducts();
-            CategoriesByProductsCount();
-            UsersAndProducts();
+            //SoldProducts();
+            //CategoriesByProductsCount();
+            //UsersAndProducts();
         }
 
         #region ImportData
@@ -176,7 +176,7 @@
                     {
                         Name = x.Name,
                         Price = x.Price,
-                        BuyerFullName = x.Buyer.FirstName + " " + x.Buyer.LastName
+                        BuyerFullName = x.Buyer.FirstName + " " + x.Buyer.LastName ?? x.Buyer.LastName
                     })
                     .ToArray();
 

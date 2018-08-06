@@ -1,7 +1,5 @@
 ﻿namespace ProductShop.App
 {
-    using AutoMapper;
-
     using Data;
     using Models;
     using Newtonsoft.Json;
@@ -15,8 +13,11 @@
     {
         public static void Main(string[] args)
         {
-            //ImportData();
+            ImportData();
             ProductsInRange();
+            SoldProducts();
+            CategoriesByProductsCount();
+            UsersAndProducts();
         }
 
         #region ImportData
@@ -138,6 +139,8 @@
 
         #endregion
 
+        #region ExportData
+
         private static void ProductsInRange()
         {
             using (var db = new ProductShopContext())
@@ -153,10 +156,113 @@
                     })
                     .ToArray();
 
+                var fileName = "products-in-range";
                 var jsonString = JsonConvert.SerializeObject(products, Formatting.Indented);
-                File.WriteAllText("../../../Json/products-in-range.json", jsonString);
+                File.WriteAllText($"../../../Json/{fileName}.json", jsonString);
+                Console.WriteLine($"Created file: {fileName}.json");
             }
         }
 
+        private static void SoldProducts()
+        {
+            using (var db = new ProductShopContext())
+            {
+                var users = db.Users
+                    .Where(x => x.ProductsSold.Count > 0 && x.ProductsSold.Any(p => p.BuyerId != null))
+                    .Select(x => new
+                    {
+                        firstName = x.FirstName,
+                        lastName = x.LastName,
+                        soldProducts = x.ProductsSold
+                            .Select(p => new
+                            {
+                                name = p.Name,
+                                price = p.Price,
+                                buyerFirstName = p.Buyer.FirstName,
+                                buyerLastName = p.Buyer.LastName
+                            }).ToArray()
+                    })
+                    .OrderBy(x => x.lastName)
+                    .ThenBy(x => x.firstName)
+                    .ToArray();
+
+                var fileName = "users-sold-products";
+                var jsonString = JsonConvert.SerializeObject(users, new JsonSerializerSettings
+                    {
+                        Formatting = Formatting.Indented,
+                        NullValueHandling = NullValueHandling.Ignore
+                    });
+                File.WriteAllText($"../../../Json/{fileName}.json", jsonString);
+                Console.WriteLine($"Created file: {fileName}.json");
+            }
+        }
+
+        private static void CategoriesByProductsCount()
+        {
+            using (var db = new ProductShopContext())
+            {
+                var categories = db.Categories
+                    .OrderByDescending(x => x.CategoryProducts.Count)
+                    .Select(x => new
+                    {
+                        category = x.Name,
+                        productsCount = x.CategoryProducts.Count,
+                        averagePrice = x.CategoryProducts.Sum(p => p.Product.Price) / x.CategoryProducts.Count,
+                        //averagePrice = x.CategoryProducts.Select(p => p.Product.Price).DefaultIfEmpty(0).Average(),
+                        totalRevenue = x.CategoryProducts.Sum(p => p.Product.Price)
+                    })
+                    .ToArray();
+
+                var fileName = "categories-by-products";
+                var jsonString = JsonConvert.SerializeObject(categories, Formatting.Indented);
+                File.WriteAllText($"../../../Json/{fileName}.json", jsonString);
+                Console.WriteLine($"Created file: {fileName}.json");
+            }
+        }
+
+        private static void UsersAndProducts()
+        {
+            using (var db = new ProductShopContext())
+            {
+                var users = db.Users
+                    .Where(x => x.ProductsSold.Count > 0)
+                    .OrderByDescending(x => x.ProductsSold.Count)
+                    .ThenBy(x => x.LastName)
+                    .Select(x => new
+                    {
+                        firstName = x.FirstName,
+                        lastName = x.LastName,
+                        age = x.Age.ToString(),
+                        soldProducts = new
+                        {
+                            count = x.ProductsSold.Count,
+                            products = x.ProductsSold
+                                .Select(p => new
+                                {
+                                    name = p.Name,
+                                    price = p.Price
+                                }).ToArray()
+                        }                        
+                    })
+                    .ToArray();
+
+                var rootUsers = new
+                {
+                    usersCount = users.Length,
+                    users
+                };
+
+                var fileName = "users-and-products";
+                var jsonString = JsonConvert.SerializeObject(rootUsers, new JsonSerializerSettings
+                {
+                    Formatting = Formatting.Indented,
+                    NullValueHandling = NullValueHandling.Ignore
+                });
+                File.WriteAllText($"../../../Json/{fileName}.json", jsonString);
+                Console.WriteLine($"Created file: {fileName}.json");
+            }
+        }
+
+        #endregion
     }
 }

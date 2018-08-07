@@ -1,17 +1,19 @@
 ﻿namespace ProductShop.App
 {
-    using Data;
-    using Models;
-    using Newtonsoft.Json;
     using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
     using DA = System.ComponentModel.DataAnnotations;
 
+    using Data;
+    using Models;
+
+    using Newtonsoft.Json;
+
     public class StartUp
     {
-        public static void Main(string[] args)
+        public static void Main()
         {
             ImportData();
             ProductsInRange();

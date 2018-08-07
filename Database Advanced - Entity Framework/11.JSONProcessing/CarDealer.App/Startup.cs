@@ -1,53 +1,54 @@
-﻿using AutoMapper;
-using CarDealer.App.Dto.Import;
-using CarDealer.Data;
-using CarDealer.Models;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Xml.Serialization;
-using DA = System.ComponentModel.DataAnnotations;
-
-namespace CarDealer.App
+﻿namespace CarDealer.App
 {
+    using System;
+    using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
+    using DA = System.ComponentModel.DataAnnotations;
+
+    using Data;
+    using Models;
+
+    using Newtonsoft.Json;
+
     class Startup
     {
         static void Main()
         {
             ImportData();
+            OrderedCustomers();
+            CarsFromMakeToyota();
+            LocalSuppliers();
+            CarsWithTheirListOfParts();
+            TotalSalesByCustomer();
+            SalesWithAppliedDiscount();
         }
+
+        #region ImportData
 
         private static void ImportData()
         {
-            var config = new MapperConfiguration(cfg =>
-            {
-                cfg.AddProfile<CarDealerProfile>();
-            });
-            var mapper = config.CreateMapper();
+            var suppliers = ImportSuppliers("suppliers");
+            var parts = ImportParts("parts", suppliers);
+            var cars = ImportCars("cars", parts);
+            var customers = ImportCustomers("customers");
+            GenerateSales(cars, customers);
 
-            var suppliers = ImportSuppliers(mapper, "suppliers.xml");
-            var parts = ImportParts(mapper, "parts.xml", suppliers);
-            var cars = ImportCars(mapper, "cars.xml", parts);
-            GenerateCarsParts(cars, parts);
-
-            Console.WriteLine($"Imorted Suppliers: {suppliers.Count}, Parts: {parts.Count}, Cars: {cars.Count}");
+            Console.WriteLine($"Imorted Suppliers: {suppliers.Count}, Parts: {parts.Count}, Cars: {cars.Count}, Customers: {customers.Count}");
         }
 
-        private static List<Supplier> ImportSuppliers(IMapper mapper, string xmlName)
+        private static List<Supplier> ImportSuppliers(string jsonName)
         {
-            var xmlString = File.ReadAllText("../../../Xml/" + xmlName);
-
-            var serializer = new XmlSerializer(typeof(SupplierDto[]), new XmlRootAttribute("suppliers"));
-            var supplierDtos = (SupplierDto[])serializer.Deserialize(new StringReader(xmlString));
+            var jsonString = File.ReadAllText("../../../Json/" + jsonName + ".json");
+            var jsonSuppliers = JsonConvert.DeserializeObject<Supplier[]>(jsonString);
 
             var suppliers = new List<Supplier>();
 
-            foreach (var supplierDto in supplierDtos)
+            foreach (var jsonSupplier in jsonSuppliers)
             {
-                if (IsValid(supplierDto))
+                if (IsValid(jsonSupplier))
                 {
-                    var user = mapper.Map<Supplier>(supplierDto);
-                    suppliers.Add(user);
+                    suppliers.Add(jsonSupplier);
                 }
             }
 
@@ -60,25 +61,21 @@ namespace CarDealer.App
             return suppliers;
         }
 
-        private static List<Part> ImportParts(IMapper mapper, string xmlName, List<Supplier> suppliers)
+        private static List<Part> ImportParts(string jsonName, List<Supplier> suppliers)
         {
-            var xmlString = File.ReadAllText("../../../Xml/" + xmlName);
-
-            var serializer = new XmlSerializer(typeof(PartDto[]), new XmlRootAttribute("parts"));
-            var partDtos = (PartDto[])serializer.Deserialize(new StringReader(xmlString));
+            var jsonString = File.ReadAllText("../../../Json/" + jsonName + ".json");
+            var jsonParts = JsonConvert.DeserializeObject<Part[]>(jsonString);
 
             var parts = new List<Part>();
 
-            foreach (var partDto in partDtos)
+            foreach (var jsonPart in jsonParts)
             {
-                if (IsValid(partDto))
+                if (IsValid(jsonPart))
                 {
-                    var part = mapper.Map<Part>(partDto);
                     var supplierId = new Random().Next(0, suppliers.Count);
+                    jsonPart.SupplierId = suppliers[supplierId].Id;
 
-                    part.SupplierId = suppliers[supplierId].Id;
-
-                    parts.Add(part);
+                    parts.Add(jsonPart);
                 }
             }
 
@@ -91,27 +88,26 @@ namespace CarDealer.App
             return parts;
         }
 
-        private static List<Car> ImportCars(IMapper mapper, string xmlName, List<Part> parts)
+        private static List<Car> ImportCars(string jsonName, List<Part> parts)
         {
-            var xmlString = File.ReadAllText("../../../Xml/" + xmlName);
-
-            var serializer = new XmlSerializer(typeof(CarDto[]), new XmlRootAttribute("cars"));
-            var carDtos = (CarDto[])serializer.Deserialize(new StringReader(xmlString));
+            var jsonString = File.ReadAllText("../../../Json/" + jsonName + ".json");
+            var jsonCars = JsonConvert.DeserializeObject<Car[]>(jsonString);
 
             var cars = new List<Car>();
 
-            foreach (var carDto in carDtos)
+            foreach (var jsonCar in jsonCars)
             {
-                if (IsValid(carDto))
+                if (IsValid(jsonCar))
                 {
-                    var car = mapper.Map<Car>(carDto);
-                    //for (int i = 10; i < new Random().Next(10,21); i++)
-                    //{
-                    //    var partId = new Random().Next(0, parts.Count);
-                    //    car.PartsCars.Add(new PartCar() { PartId = parts[partId].Id });
-                    //}                    
+                    var partIds = new List<int>(parts.Select(x => x.Id).ToArray());
+                    for (int i = 0; i < new Random().Next(10, 21); i++)
+                    {
+                        var partId = new Random().Next(0, partIds.Count);
+                        jsonCar.PartsCars.Add(new PartCar() { PartId = partIds[partId] });
+                        partIds.RemoveAt(partId);
+                    }
 
-                    cars.Add(car);
+                    cars.Add(jsonCar);
                 }
             }
 
@@ -124,22 +120,51 @@ namespace CarDealer.App
             return cars;
         }
 
-        private static void GenerateCarsParts(List<Car> cars, List<Part> parts)
+        private static List<Customer> ImportCustomers(string jsonName)
         {
-            var partsCars = new List<PartCar>();
-            foreach (var car in cars)
+            var jsonString = File.ReadAllText("../../../Json/" + jsonName + ".json");
+            var jsonCustomers = JsonConvert.DeserializeObject<Customer[]>(jsonString);
+
+            var customers = new List<Customer>();
+
+            foreach (var jsonCustomer in jsonCustomers)
             {
-                var rnd = new Random();
-                //for (int i = 1; i < new Random().Next(10, 21); i++)
+                if (IsValid(jsonCustomer))
                 {
-                    var partId = rnd.Next(0, parts.Count);
-                    partsCars.Add(new PartCar() { PartId = parts[partId].Id, CarId = car.Id });
+                    customers.Add(jsonCustomer);
                 }
             }
 
             using (var db = new CarDealerContext())
             {
-                db.PartsCars.AddRange(partsCars);
+                db.Customers.AddRange(customers);
+                db.SaveChanges();
+            }
+
+            return customers;
+        }
+
+        private static void GenerateSales(List<Car> cars, List<Customer> customers)
+        {
+            var sales = new List<Sale>();
+            int[] discounts = { 0, 5, 10, 15, 20, 30, 40, 50 };
+            for (int i = 0; i < 50; i++)
+            {
+                var carId = new Random().Next(0, cars.Count);
+                var customerId = new Random().Next(0, customers.Count);
+                var discountId = new Random().Next(0, discounts.Length);
+
+                sales.Add(new Sale()
+                {
+                    CarId = cars[carId].Id,
+                    CustomerId = customers[customerId].Id,
+                    Discount = discounts[discountId]
+                });
+            }
+
+            using (var db = new CarDealerContext())
+            {
+                db.Sales.AddRange(sales);
                 db.SaveChanges();
             }
         }
@@ -153,5 +178,142 @@ namespace CarDealer.App
             return isValid;
         }
 
+        #endregion
+
+        #region ExportData
+
+        private static void OrderedCustomers()
+        {
+            using (var db = new CarDealerContext())
+            {
+                var customers = db.Customers
+                    .OrderBy(x => x.BirthDate)
+                    .ThenBy(x => x.IsYoungDriver)
+                    .ToArray();
+
+                CreateFile("ordered-customers", customers);
+            }
+        }
+
+        private static void CarsFromMakeToyota()
+        {
+            using (var db = new CarDealerContext())
+            {
+                var cars = db.Cars
+                    .Where(x => x.Make == "Toyota")
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Make,
+                        x.Model,
+                        x.TravelledDistance
+                    })
+                    .OrderBy(x => x.Model)
+                    .ThenBy(x => x.TravelledDistance)
+                    .ToArray();
+
+                CreateFile("toyota-cars", cars);
+            }
+        }
+
+        private static void LocalSuppliers()
+        {
+            using (var db = new CarDealerContext())
+            {
+                var suppliers = db.Suppliers
+                    .Where(x => x.IsImporter == false)
+                    .Select(x => new
+                    {
+                        x.Id,
+                        x.Name,
+                        PartsCount = x.Parts.Count
+                    })
+                    .ToArray();
+
+                CreateFile("local-suppliers", suppliers);
+            }
+        }
+
+        private static void CarsWithTheirListOfParts()
+        {
+            using (var db = new CarDealerContext())
+            {
+                var cars = db.Cars
+                    .Select(x => new
+                    {
+                        car = new
+                        {
+                            x.Make,
+                            x.Model,
+                            x.TravelledDistance
+                        },
+                        parts = x.PartsCars.Select(p => new
+                        {
+                            p.Part.Name,
+                            p.Part.Price
+                        })
+                    })
+                    .ToArray();
+
+                CreateFile("cars-and-parts", cars);
+            }
+        }
+
+        private static void TotalSalesByCustomer()
+        {
+            using (var db = new CarDealerContext())
+            {
+                var customers = db.Customers
+                    .Where(x => x.Sales.Count > 0)
+                    .Select(x => new
+                    {
+                        fullName = x.Name,
+                        boughtCars = x.Sales.Count,
+                        spentMoney = x.Sales.Select(s => s.Car.PartsCars.Select(p => p.Part.Price).Sum()).Sum()
+                    })
+                    .OrderByDescending(x => x.spentMoney)
+                    .ThenByDescending(x => x.boughtCars)
+                    .ToArray();
+
+                CreateFile("customers-total-sales", customers);
+            }
+        }
+
+        private static void SalesWithAppliedDiscount()
+        {
+            using (var db = new CarDealerContext())
+            {
+                var sales = db.Sales
+                    .Select(x => new
+                    {
+                        car = new
+                        {
+                            x.Car.Make,
+                            x.Car.Model,
+                            x.Car.TravelledDistance
+                        },
+                        customerName = x.Customer.Name,
+                        Discount = (double)x.Discount / 100,
+                        price = x.Car.PartsCars.Select(p => p.Part.Price).Sum(),
+                        priceWithDiscount = x.Car.PartsCars.Select(p => p.Part.Price).Sum() * (decimal)(100 - x.Discount) / 100
+                    })
+                    .ToArray();
+
+                CreateFile("sales-discounts", sales);
+            }
+        }
+
+        private static void CreateFile(string fileName, object value)
+        {
+            var jsonString = JsonConvert.SerializeObject(value, new JsonSerializerSettings
+            {
+                Formatting = Formatting.Indented,
+                NullValueHandling = NullValueHandling.Ignore
+            });
+            File.WriteAllText($"../../../Json/{fileName}.json", jsonString);
+            Console.WriteLine($"Created file: {fileName}.json");
+        }
+
+        #endregion
     }
 }

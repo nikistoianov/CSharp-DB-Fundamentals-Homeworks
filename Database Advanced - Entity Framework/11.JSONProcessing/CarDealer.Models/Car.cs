@@ -21,7 +21,7 @@
 
         public double TravelledDistance { get; set; }
 
-        public ICollection<PartCar> PartsCars { get; set; }
-        public ICollection<Sale> Sales { get; set; }
+        public virtual ICollection<PartCar> PartsCars { get; set; }
+        public virtual ICollection<Sale> Sales { get; set; }
     }
 }

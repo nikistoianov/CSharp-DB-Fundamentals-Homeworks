@@ -24,7 +24,9 @@ namespace CarDealer.Data
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseSqlServer(Configuration.ConnectionString);
+                optionsBuilder
+                    //.UseLazyLoadingProxies()
+                    .UseSqlServer(Configuration.ConnectionString);
             }
         }
 

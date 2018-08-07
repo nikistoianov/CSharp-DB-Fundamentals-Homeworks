@@ -6,12 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="automapper" Version="7.0.1" />
+    <PackageReference Include="newtonsoft.json" Version="11.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\CarDealer.Data\CarDealer.Data.csproj" />
     <ProjectReference Include="..\CarDealer.Models\CarDealer.Models.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Json\" />
   </ItemGroup>
 
 </Project>

@@ -17,6 +17,6 @@
 
         public bool IsImporter { get; set; }
 
-        public ICollection<Part> Parts { get; set; }
+        public virtual ICollection<Part> Parts { get; set; }
     }
 }

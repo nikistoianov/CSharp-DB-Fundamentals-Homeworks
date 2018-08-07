@@ -1,0 +1,6 @@
+install-package automapper
+install-package newtonsoft.json
+
+install-package microsoft.entityframeworkcore.sqlserver
+install-package microsoft.entityframeworkcore.tools
+install-package microsoft.entityframeworkcore.proxies
